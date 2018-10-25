@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd	
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd" default-autowire="byName">
+
+	<!-- Scans within the base package of the application for @Components to configure as beans -->
+	<bean id="placeholderConfig"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location" value="classpath:db.properties" />
+	</bean>
+	
+	 <bean id="dataSourceBean" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+       <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+       <property name="url" value="jdbc:mysql://localhost:3306/spring_jpa_hibernate_integration_tiles" />
+       <property name="username" value="root" />
+       <property name="password" value="1234" />
+   </bean>
+   
+     <bean id="hibernateAdapterBean" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">  
+        <property name="showSql" value="true"></property>  
+        <property name="generateDdl" value="true"></property>  
+        <property name="databasePlatform" value="org.hibernate.dialect.MySQL5Dialect"></property> 
+     </bean>  
+   
+	
+	<bean id="entityManagerFactoryBean" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+      <property name="dataSource" ref="dataSourceBean" />
+      <property name="jpaVendorAdapter" ref="hibernateAdapterBean"></property>  
+      <property name="persistenceXmlLocation" value="classpath:./META-INF/persistence.xml" />
+   </bean>
+   
+   
+   <!-- as of Spring 3.1, in favor of native EntityManager usage (typically obtained through @PersistenceContext) 
+      Note that this class did not get upgraded to JPA 2.0 and never will.  -->
+   
+  <!--     <bean id="jpaTemplateBean" class="org.springframework.orm.jpa.JpaTemplate">  
+        <property name="entityManagerFactory" ref="entityManagerFactoryBean"></property>  
+     </bean>
+  -->
+        <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">  
+        <property name="entityManagerFactory" ref="entityManagerFactoryBean"></property>  
+       </bean> 
+ 
+        <tx:annotation-driven transaction-manager="transactionManager"/>
+	
+
+	
+</beans>
